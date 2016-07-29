@@ -3,6 +3,7 @@ from selenium import webdriver
 import re
 import codecs
 import math
+import time
 
 ##phantomjs_path = r'C:\Phantom\phantomjs-2.0.0-windows\bin\phantomjs.exe'
 ##driver = webdriver.PhantomJS(phantomjs_path)
@@ -63,7 +64,7 @@ def findAnimeRatings():
     ######      </span>
                 genre = ",".join(x.a['title'] for x in eAnime.find_all('span',{"class":"genre"})) 
             
-                allAnimes.append((name,{'rating':rating},{'countdown':'N/A'},{'genre':genre}))
+                allAnimes.append((name,{'rating':rating},{'countdown':None},{'genre':genre}))
     finally:
         driver.quit() ##close the browser
     return allAnimes
@@ -74,11 +75,13 @@ def findCountdown(lst,name):
             return(d['countdown'])
     return 'N/A'
  
-def writeTextFile(animeList,fileName):
+def writeTextFile(animeList,fileName,nameMaxLength):
     with codecs.open(fileName,'w','UTF-16') as f:
+        date = time.strftime("%a, %d/%m/%Y")
+        f.write('The following data were extracted on: '+date+'\r\n-----------------------------------------------------------------------------------------------------------\r\n')
+        
         for x in animeList:
-            msg = u""
-            msg += x[0]+' =>> rating: '+x[1]['rating']+' -- countdown: '+x[2]['countdown']+' -- genre:'+x[3]['genre']  + '\r\n\r\n'
+            msg = "{:{}} =>> rating:{:6} -- countdown:{:50} -- genre:{}\r\n\r\n".format(x[0],(nameMaxLength+5),x[1]['rating'],x[2]['countdown'],x[3]['genre'])
             f.write(msg)
                      
 def buildSortedList(animeList,ratingList):
@@ -95,9 +98,12 @@ if __name__ == "__main__":
     animeCountdown = findAnimeCountdown()
     allAnimes = findAnimeRatings()
     ##Fill the countdown stats
+    nameMaxLength = 0
     for anime in allAnimes:
         name = anime[0]
         anime[2]['countdown']= findCountdown(animeCountdown,name)
+        if len(name) > nameMaxLength:
+            nameMaxLength = len(name)
    
     ##sort the list by ratings
     sortedRatingList = sorted([float(anime[1]['rating']) for anime in allAnimes if (re.match('[0-9][.][0-9]+',anime[1]['rating']))],reverse=True) 
@@ -105,7 +111,7 @@ if __name__ == "__main__":
     sortedAnimeList = buildSortedList(allAnimes,sortedRatingList)
 
     fileName = "output.txt"
-    writeTextFile(sortedAnimeList,fileName)
+    writeTextFile(sortedAnimeList,fileName,nameMaxLength)
 
         
 
