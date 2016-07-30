@@ -1,27 +1,18 @@
 from bs4 import BeautifulSoup
-from selenium import webdriver
+import urllib.request
 import re
 import codecs
 import math
 import time
 
-def getHTML(browserType,URL):
-    if 'phantomjs' == browserType:
-        phantomjs_path = r'C:\Phantom\phantomjs-2.1.1-windows\bin\phantomjs.exe'
-        driver = webdriver.PhantomJS(executable_path = phantomjs_path)
-    elif 'firefox' == browserType:
-        driver = webdriver.Firefox()
-    elif 'chrome' == browserType:
-        driver = webdriver.Chrome()
-  
-    driver.get(URL)
-    html = driver.page_source
-    driver.quit() ##close the browser
+def getHTML(url):
+    req = urllib.request.Request(url,headers={'User-Agent': 'Mozilla/5.0'})
+    html = urllib.request.urlopen(req).read()
     return html
 
 ##find episode countdown in website with url: (livechart.me) https://www.livechart.me
-def findAnimeCountdown(browserType,URL):
-    html = getHTML(browserType,URL)
+def findAnimeCountdown(URL):
+    html = getHTML(URL)
     soup = BeautifulSoup(html,'html.parser')
 
     animeTags = soup.find_all('div',{"class":"anime-card"}) ##find tag 'div' with attribute 'class=anime-card'
@@ -46,8 +37,8 @@ def findAnimeCountdown(browserType,URL):
 
 
 ##find rating in different website with url: (myanimelist.net) http://myanimelist.net/anime/season
-def findAnimeRatings(browserType,URL):
-    html = getHTML(browserType,URL)
+def findAnimeRatings(URL):
+    html = getHTML(URL)
     soup = BeautifulSoup(html,'html.parser')
 
     seasons = soup.find_all('div',{"class":"seasonal-anime-list js-seasonal-anime-list js-seasonal-anime-list-key-1 clearfix"})
@@ -96,15 +87,8 @@ def buildSortedList(animeList,ratingList):
     return sortedAnimeList
                      
 if __name__ == "__main__":
-    browserList = ['firefox','chrome','phantomjs']
-    while True:
-        browserType = input('Please enter the desired web browser (firefox/chrome/phantomJS): ')
-        browserType = browserType.lower()
-        if browserType in browserList:
-            break
-        
-    animeCountdown = findAnimeCountdown(browserType,URL='https://www.livechart.me')
-    allAnimes = findAnimeRatings(browserType,URL='http://myanimelist.net/anime/season')
+    animeCountdown = findAnimeCountdown(URL='https://www.livechart.me')
+    allAnimes = findAnimeRatings(URL='http://myanimelist.net/anime/season')
 
     ##Fill the countdown stats
     nameMaxLength = 0
