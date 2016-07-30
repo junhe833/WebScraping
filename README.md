@@ -6,5 +6,5 @@ websites and sort them by their respective rating from highest to lowest. The re
 
 A sample file has been uploaded called "output".
 
-This script was written in Python using headed browser (Firefox) which can be changed to headless browser (phantomJS) 
-to improve its performance.
+"WebScraping.py" was written in Python using headed browser (Firefox) while "HeadlessWebScraping.py" uses headless browser (phantomJS) 
+for improved performance.
