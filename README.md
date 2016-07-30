@@ -6,5 +6,5 @@ websites and sort them by their respective rating from highest to lowest. The re
 
 A sample file has been uploaded called "output".
 
-"WebScraping.py" was written in Python using headed browser (Firefox) while "HeadlessWebScraping.py" uses headless browser (phantomJS) 
+"Firefox.py" was written in Python using headed browser (Firefox) while "PhantomJS.py" uses headless browser (phantomJS) 
 for improved performance.
