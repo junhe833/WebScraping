@@ -7,6 +7,6 @@ websites and sort them by their respective rating from highest to lowest. The re
 
 The script "WebScraping.py" was written in Python. It prompts the user to choose a web browser to extract data.
 
-The "PhantomJS.py" is a headless browser (a web browser without GUI) for improved performance.
+"PhantomJS.exe" is a stand-alone executable which employs a headless browser (a web browser without GUI) for improved performance.
 
 A sample file has been uploaded called "output".
