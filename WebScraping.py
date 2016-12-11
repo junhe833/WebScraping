@@ -4,6 +4,7 @@ import re
 import codecs
 import math
 import time
+from operator import attrgetter
 
 def getHTML(url):
     req = urllib.request.Request(url,headers={'User-Agent': 'Mozilla/5.0'})
@@ -66,45 +67,43 @@ def findCountdown(lst,name):
             return(d['countdown'])
     return 'N/A'
  
-def writeTextFile(animeList,fileName,nameMaxLength):
+def writeTextFile(animeList,fileName = time.strftime('%Y-%B')+'.txt',nameMaxLength=10,genreMaxLength=10):
     with codecs.open(fileName,'w','UTF-16') as f:
         date = time.strftime("%a, %d/%m/%Y")
         f.write('The following data were extracted on: '+date+'\r\n-----------------------------------------------------------------------------------------------------------\r\n')
         
         for x in animeList:
-            msg = "{:{}} =>> rating:{:6} -- countdown:{:50} -- genre:{}\r\n\r\n".format(x[0],(nameMaxLength+5),x[1]['rating'],x[2]['countdown'],x[3]['genre'])
+            msg = "{:{}} =>> rating:{:6} -genre:{:{}} -countdown:{:50} \r\n\r\n".format(x[0],(nameMaxLength+3),x[1]['rating'],x[3]['genre'],(genreMaxLength+3),x[2]['countdown'])
             f.write(msg)
-                     
-def buildSortedList(animeList,ratingList):
-    sortedAnimeList = []
-
-    for rating in ratingList:    
-        tempList = [anime for anime in animeList if (anime[1]['rating'] != 'N/A' and float(anime[1]['rating'])== float(rating))]
-        sortedAnimeList.extend( tempList ) ##add the element by index
-    
-    tempList = [anime for anime in animeList if anime[1]['rating'] == 'N/A']                  
-    sortedAnimeList.extend( tempList ) ##append the remaining list
-    return sortedAnimeList
+                   
                      
 if __name__ == "__main__":
     animeCountdown = findAnimeCountdown(URL='https://www.livechart.me')
     allAnimes = findAnimeRatings(URL='http://myanimelist.net/anime/season')
 
     ##Fill the countdown stats
-    nameMaxLength = 0
+    nameMaxLength = 10
+    genreMaxLength = 10
     for anime in allAnimes:
         name = anime[0]
         anime[2]['countdown']= findCountdown(animeCountdown,name)
         if len(name) > nameMaxLength:
-            nameMaxLength = len(name)
-   
+            nameMaxLength = len(name)    
+        genre = anime[3]['genre']
+        if len(genre) > genreMaxLength:
+            genreMaxLength = len(genre)
+    
     ##sort the list by ratings
-    sortedRatingList = sorted(set(float(anime[1]['rating']) for anime in allAnimes if (re.match('[0-9][.][0-9]+',anime[1]['rating']))),reverse=True) ##sorted unique set
-  
-    sortedAnimeList = buildSortedList(allAnimes,sortedRatingList)
+    rating_NA_list = []
+    rating_list = []
+    for anime in allAnimes:
+        if anime[1]['rating'] == 'N/A':
+            rating_NA_list.append(anime)
+        else:
+            rating_list.append(anime)
 
-    fileName = "output.txt"
-    writeTextFile(sortedAnimeList,fileName,nameMaxLength)
+    sortedAnimeList = sorted(rating_list, key =lambda tup: tup[1]['rating'], reverse = True)
+    sortedAnimeList.extend(rating_NA_list)
 
-        
-
+    writeTextFile(sortedAnimeList,fileName=time.strftime('%Y-%B')+'.txt',nameMaxLength=nameMaxLength,genreMaxLength=genreMaxLength)
+     
