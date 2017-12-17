@@ -28,7 +28,7 @@ def findAnimeCountdown(URL):
              nextEpisodeInfo = 'N/A'
         else: ##tag format:  <div class="episode-countdown">EP5: <time data-timestamp="1469883600000" datetime="2016-07-30T13:00:00Z">01d 17h 30m 30s</time></div>
              nextEpNum = nextEp_countdown.contents[0]
-             nextEpDate = nextEp_countdown.time['datetime']
+             nextEpDate = nextEp_countdown.time.string
              daysCountdown = nextEp_countdown.time.string
              nextEpisodeInfo = " ".join((nextEpNum,daysCountdown,nextEpDate))
            
